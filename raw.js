@@ -225,8 +225,7 @@ module.exports.setEvent=async(client,path,from)=>{try{
       if (err) return console.error(err);
       files.forEach(file => {try{
             let target_module = require(`${path}/${file}`);
-            let isDir = fs.lstatSync(`${path}/${file}`).isDirectory(); console.log(isDir);
-            if(isDir) return;
+            
             let moduleName = file.split(".")[0];
             module.exports.se0(client,target_module,path,moduleName);
         }catch(err){console.log(err);};});//if end
