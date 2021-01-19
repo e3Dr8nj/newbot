@@ -1,4 +1,5 @@
 //raw v2.1.0
+let fs = require('fs');
 exports.external_module=[];
 exports.log=true;
 exports.dm_commands=false;
@@ -172,19 +173,8 @@ module.exports.setCommand=async(client,path,from)=>{try{
      module.exports.external_module.map(m=>module.exports.sc0(client,m,'..external..',m.name));
      return;
    };//if external end
-   let fs = require('fs');
-
-  fs.readdir(path+"/", (err, files) => {try{
-   //if (err) return console.error(err);
-    files.forEach(file => {try{ 
-            let target_module = require(`${path}/${file}`);
-            
-            let moduleName = file.split(".")[0];
-           module.exports.sc0(client,target_module,path,moduleName);
-     }catch(err){console.log(err);};});//forEach end
-
-}catch(err){console.log(err);};
-});//event trigger
+   
+    module.exports.apply(client,path,module.exports.sc0);
 //--------------------
 }catch(err){console.log(err)};};//setCommand end
 //____________________sc0
@@ -340,15 +330,38 @@ module.exports.test={ on:true,  run:async()=>{try{
 //-------------------
 module.exports.load_all=async(client,folder_name)=>{try{
          
-    await module.exports.setBoot(client,folder_name,'folder');
+   // await module.exports.setBoot(client,folder_name,'folder');
     //await module.exports.setBoot(client,folder_name,'external');
     await module.exports.setCommand(client,folder_name,'folder');
    // await module.exports.setCommand(client,folder_name,'external');
-    await  module.exports.setEvent(client,folder_name,'folder'); 
+ //   await  module.exports.setEvent(client,folder_name,'folder'); 
    // await  module.exports.setEvent(client,folder_name,'external');
-    await  module.exports.setEvent_primitive(client,folder_name,'folder'); 
+ //   await  module.exports.setEvent_primitive(client,folder_name,'folder'); 
    // await  module.exports.setEvent_primitive(client,folder_name,'external');
                
+}catch(err){console.log(err)};};
+
+module.exports.apply=async(client,path,func)=>{try{
+       
+   function apply(path,func){
+  fs.readdir(path+"/", (err, files) => {try{
+   //if (err) return console.error(err);
+    files.forEach(file=> {try{ 
+      
+            let path1=`${path}/${file}`;
+            let isDir = fs.existsSync(path1) && fs.lstatSync(path1).isDirectory();
+            if(isDir) { return apply(path1,func); };
+            let target_module = require(`${path}/${file}`);
+            
+            let moduleName = file.split(".")[0];
+            func(client,target_module,path,moduleName);
+            
+     }catch(err){console.log(err);};});//forEach end
+    
+  }catch(err){console.log(err);};
+  });//event trigger
+  };//--appply
+            return apply(path,func);
 }catch(err){console.log(err)};};
 
 module.exports.buildRh=async(client)=>{try{
