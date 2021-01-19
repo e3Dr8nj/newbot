@@ -73,7 +73,6 @@ if(tag>0) {
 //____________________________________________________________
 
 //______________________________________________ON_MESSAGE___EVENT
-//______________________________________________ON_MESSAGE___EVENT
 
 exports.onMessage=async(client,event_d)=>{try{
  
@@ -179,6 +178,7 @@ module.exports.setCommand=async(client,path,from)=>{try{
    //if (err) return console.error(err);
     files.forEach(file => {try{ 
             let target_module = require(`${path}/${file}`);
+            
             let moduleName = file.split(".")[0];
            module.exports.sc0(client,target_module,path,moduleName);
      }catch(err){console.log(err);};});//forEach end
@@ -225,6 +225,8 @@ module.exports.setEvent=async(client,path,from)=>{try{
       if (err) return console.error(err);
       files.forEach(file => {try{
             let target_module = require(`${path}/${file}`);
+            let isDir = fs.lstatSync(`${path}/${file}`).isDirectory(); console.log(isDir);
+            if(isDir) return;
             let moduleName = file.split(".")[0];
             module.exports.se0(client,target_module,path,moduleName);
         }catch(err){console.log(err);};});//if end
@@ -262,6 +264,7 @@ module.exports.setEvent_primitive=async(client,path,from)=>{try{
       if (err) return console.error(err);
       files.forEach(file => {try{
             let target_module = require(`${path}/${file}`);
+            
             let moduleName = file.split(".")[0];
             module.exports.sep0(client,target_module,path,moduleName);
        }catch(err){console.log(err);};});//if end

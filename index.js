@@ -14,7 +14,7 @@ let client = new Discord.Client();
 client.prefix='!!';
 client.SERVER_ID='476431736813912064';
 //
-let RH=require(`./raw1.js`);
+let RH=require(`./raw.js`);
 RH.folder_name=`./modules`; // RH.folder_name='C:/user/discord/bot4/modules';- for pc running
 RH.prefix=client.prefix;//prefix for commands; default value: '!'
 client.on("raw", (...args) => {try{
