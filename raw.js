@@ -10,7 +10,7 @@ exports.server_id='';
 exports.boots=true;
 exports.commands=true;
 exports.events=true;
-exports.primitive_events=true;
+exports.events_primitive=true;
 
 exports.delay=async(duration)=>{ return new Promise((resolve)=>{return setTimeout(resolve,duration)}); };
 exports.random =(max)=>{ return Math.floor(Math.random()*max);};
@@ -168,16 +168,22 @@ module.exports.sb0=async(client,target_module,path,moduleName)=>{try{
 module.exports.setCommand=async(client,path,from)=>{try{
    if (!module.exports.commands) return;
    await exports.delay(1000);
-  // if(from=='one'){};
    if(from=='external') {
-     module.exports.external_module.map(m=>module.exports.sc0(client,m,'..external..',m.name));
-     return;
+     module.exports.external_module.map(m=>module.exports.sc0(client,m,'..external..',m.name)); return;
    };//if external end
-   
-    module.exports.apply(client,path,module.exports.sc0);
-//--------------------
+   module.exports.apply(client,path,module.exports.sc0);
 }catch(err){console.log(err)};};//setCommand end
 //____________________sc0
+module.exports.setSome=async(client,path,from,type,funcName)=>{try{
+   //let type="commands"; let funcName = 'sc0';
+   if (!module.exports[type]) return;
+   await exports.delay(1000);
+   if(from=='external') {
+     module.exports.external_module.map(m=>module.exports[funcName](client,m,'..external..',m.name)); return;
+   };//if external end
+   module.exports.apply(client,path,module.exports[funcName]);
+}catch(err){console.log(err)};};//setCommand end
+//_____
 
 module.exports.sc0=async(client,target_module,path,moduleName)=>{try{
         if(!target_module.RH_IGNORE_TOTAL&&!!target_module.commands&&!target_module.RH_IGNORE_COMMANDS){    
@@ -246,8 +252,7 @@ module.exports.setEvent_primitive=async(client,path,from)=>{try{
    await exports.delay(1000);
    let fs = require('fs');
     if(from=='external'){
-        module.exports.external_module.map(m=>module.exports.sep0(client,m,'..external..',m.name));
-        return;
+        module.exports.external_module.map(m=>module.exports.sep0(client,m,'..external..',m.name)); return;
    };//if external end
    fs.readdir(path+"/", (err, files) => {try{
       if (err) return console.error(err);
@@ -332,12 +337,15 @@ module.exports.load_all=async(client,folder_name)=>{try{
          
    // await module.exports.setBoot(client,folder_name,'folder');
     //await module.exports.setBoot(client,folder_name,'external');
-    await module.exports.setCommand(client,folder_name,'folder');
+    await module.exports.setSome(client,folder_name,'folder','boots','sb0');
    // await module.exports.setCommand(client,folder_name,'external');
+  await module.exports.setSome(client,folder_name,'folder','commands','sc0');
  //   await  module.exports.setEvent(client,folder_name,'folder'); 
    // await  module.exports.setEvent(client,folder_name,'external');
+    await module.exports.setSome(client,folder_name,'folder','events','se0');
  //   await  module.exports.setEvent_primitive(client,folder_name,'folder'); 
    // await  module.exports.setEvent_primitive(client,folder_name,'external');
+  await module.exports.setSome(client,folder_name,'folder','events_primitive','sep0');
                
 }catch(err){console.log(err)};};
 

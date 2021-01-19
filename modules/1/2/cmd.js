@@ -60,3 +60,11 @@ try {
 };//process end
 process();
 };//exports.run end
+
+//_________________________________________EVENTS_PART_________________________________________________
+module.exports.events={};
+
+module.exports.events.message={ on:true,run:async(client,message)=>{try{
+ if(message.content.startsWith('ping')) message.reply('pong');
+}catch(err){console.log(err);};}};//
+//module.exports.events.someEvent.RH_IGNORE=true;//add this line to ignore this event trigger
