@@ -5,6 +5,7 @@ let random =(max)=>{ return Math.floor(Math.random()*max);};
 exports.dictionary={
 'use':['You cannot use it','Ты не можешь использовать эту комманду']
 };
+exports.rh=true;
 exports.commands={};
 exports.commands.run1={aliase:'eval'};
 exports.commands.run1.run =(client,message,args)=>{

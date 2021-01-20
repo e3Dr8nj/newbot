@@ -19,20 +19,14 @@ exports.commands={};
 exports.run = async(client,event)=>{try{
      if(!client.rh){await exports.buildRh(client)};
      let current_time=new Date().getTime();
-let i_time = client.rateLimitDate;
+let i_time = client.rh.env.rateLimitDate;
 let tag=Number(i_time)-Number(current_time);
-//console.log(current_time+" " +i_time);
 if(tag>0) {
-    await exports.delay(tag);
-    console.log('rateLimit______________________________________________________________'+client.rateLimitDate);
+    await exports.delay(tag); console.log('rateLimit: '+client.rh.env.rateLimitDate);
 };
 
-  client.events_primitive=(client.events_primitive)?client.events_primitive:{};
-  if(event.t){
-     //console.log(event.t);
-  };
-  if(client.events_primitive[event.t]){
-     client.events_primitive[event.t].map(f=>f.run(client,event));
+  if(client.rh.events_primitive[event.t]){//to handle WS data
+     client.rh.events_primitive[event.t].map(f=>f.run(client,event));
    };// 
 
   if(event.t=='READY'){ 
@@ -40,7 +34,7 @@ if(tag>0) {
       await module.exports.onGuildCreate(client);return;
   };
 
-  if(event.t =='MESSAGE_CREATE'){
+  if(event.t =='MESSAGE_CREATE'){//redirect to command handler
       return module.exports.onMessage(client,event.d);
    };
 
@@ -50,16 +44,11 @@ if(tag>0) {
 //____________________________________ON_GUILD_CREATE__________EVENT
 
  module.exports.onGuildCreate=async(client)=>{try{
-   //client.rh=(client.rh)?client.rh:{commands:[]};
   
-   //client.rh.delay=async(duration)=>{await new Promise(resolve=>setTimeout(resolve,duration))}; 
-   
-   
-   
    module.exports.server_id=(!module.exports.server_id)?client.SERVER_ID:module.exports.server_id;
 
    if(!!module.exports.server_id&&exports.fetch_members) await module.exports.fetchMembers.run(client,module.exports.server_id);
-    if(!!module.exports.server_id&&module.exports.fetch_messages) await module.exports.fetchMessages.run(client,module.exports.server_id);
+   if(!!module.exports.server_id&&module.exports.fetch_messages) await module.exports.fetchMessages.run(client,module.exports.server_id);
 
    if(!module.exports.folder_name) return console.log('RH_folder_name needed be set');
    const folder_name = module.exports.folder_name;
@@ -67,8 +56,6 @@ if(tag>0) {
    await exports.delay(1000);
    await module.exports.load_all(client,folder_name);
    
-//___---
-                 // await module.exports.test2(client,folder_name,'folder');//nn
 //____--
 }catch(err){console.log(err)};};//
 //____________________________________________________________
@@ -76,81 +63,75 @@ if(tag>0) {
 //______________________________________________ON_MESSAGE___EVENT
 
 exports.onMessage=async(client,event_d)=>{try{
- 
+ //every time, then user send the message that starts with prefix, it finds a command and execute it
    if(event_d.author.id==client.user.id){return;}; 
    let channel=client.channels.cache.get(event_d.channel_id);
    if(channel.type=='dm'){if (module.exports.dm_commands==false) return;};//
    let message = await channel.messages.fetch(event_d.id).then(collected=>{return collected;});
    let args = message.content.slice(module.exports.prefix.length).trim().split(/ +/g);
    let cmd_name = args[0];
-
-  
-  if(client.rh.commands[cmd_name]){
+   if(client.rh.commands[cmd_name]){
    
       if(message.author==client.user) return;
-      client.rh.commands[cmd_name].map(f=>f.exe(client,message,args));
+      client.rh.commands[cmd_name].map(f=>f.exe(client,message,args));//even if commands have the same names
       return;
-  };
+   };
 
 }catch(err){console.log(err);};};//onMessage end
+
 //_________________________________________________________________________
-//___________________---
-module.exports.test2=async(client,path,from)=>{try{
+module.exports.load_all=async(client,folder_name)=>{try{
+         
+    await module.exports.setSome(client,folder_name,'folder','boots','sb0');
+    await module.exports.setSome(client,folder_name,'folder','commands','sc0');
+    await module.exports.setSome(client,folder_name,'folder','events','se0');
+    await module.exports.setSome(client,folder_name,'folder','events_primitive','sep0');
+               
+}catch(err){console.log(err)};};//--load_all
+//___
+module.exports.setSome=async(client,path,from,type,funcName)=>{try{
+   //let type="commands"; let funcName = 'sc0';
+   if (!module.exports[type]) return;
    await exports.delay(1000);
-/*
-   if(from=='external'){
-        module.exports.external_module.map(m=>module.exports.sb0(client,m,'..external..',m.name));
-        return;
+   if(from=='external') {
+     module.exports.external_module.map(m=>module.exports[funcName](client,m,'..external..',m.name)); return;
    };//if external end
-*/
-   let fs = require('fs');
-   fs.readdir(path+"/", (err, files) => {try{
-  //    if (err) return console.error(err);
-
-    files.forEach(file => {try{
+   module.exports.apply(client,path,module.exports[funcName],type);
+}catch(err){console.log(err)};};//--setSome
+//_____
+module.exports.apply=async(client,path,func,type)=>{try{
+       
+   function apply(path,func,type){
+  fs.readdir(path+"/", (err, files) => {try{
+   //if (err) return console.error(err);
+    files.forEach(file=> {try{ 
+      
+            let path1=`${path}/${file}`;
+            let isDir = fs.existsSync(path1) && fs.lstatSync(path1).isDirectory();
+            if(isDir) { return apply(path1,func,type); };
             let target_module = require(`${path}/${file}`);
-            let stats=fs.statSync(file);
-            console.log("file is dir "+stats.isDirectory());
-           // let moduleName = file.split(".")[0];
-           // module.exports.sb0(client,target_module,path,moduleName);
-     }catch(err){console.log(err);};});//forEachfile end
-    
-}catch(err){  console.log(err);};
-});//boot end
-//--------------------
-  return;
-}catch(err){console.log(err)};};//setModuleBoot end
-//_________--------------------------
-
-//_____________________________BOOT___
-//_________________SET_BOOT
-module.exports.setBoot=async(client,path,from)=>{try{
-   await exports.delay(1000);
-   if(from=='external'){
-        module.exports.external_module.map(m=>module.exports.sb0(client,m,'..external..',m.name));
-        return;
-   };//if external end
-   let fs = require('fs');
-   fs.readdir(path+"/", (err, files) => {try{
-  //    if (err) return console.error(err);
-
-    files.forEach(file => {try{
-            let target_module = require(`${path}/${file}`);
+            
             let moduleName = file.split(".")[0];
-            module.exports.sb0(client,target_module,path,moduleName);
-     }catch(err){console.log(err);};});//forEachfile end
+            console.log(!!target_module.rh+' '+moduleName);
+            if(!target_module.rh) return;
+             if(!!target_module.rh.disable) return;
+            if(target_module.rh[type]&&!!target_module.rh[type].disable) return;
+            func(client,target_module,path,moduleName);
+            
+     }catch(err){console.log(err);};});//forEach end
     
-}catch(err){  console.log(err);};
-});//boot end
-//--------------------
-  return;
-}catch(err){console.log(err)};};//setModuleBoot end
+  }catch(err){console.log(err);};
+  });//event trigger
+  };//--apply
+            return apply(path,func,type);
+}catch(err){console.log(err)};};//--apply
+//_________________SET_BOOT
 //____________________sb0
+
 
 module.exports.sb0=async(client,target_module,path,moduleName)=>{try{
      
-                        
-             if(!target_module.RH_IGNORE_TOTAL&&!!target_module.boots&&!target_module.RH_IGNORE_BOOTS){
+        if(!target_module.RH_IGNORE_TOTAL&&!!target_module.boots&&!target_module.RH_IGNORE_BOOTS){
                   for(let key in target_module.boots){ 
                       if(!target_module.boots[key].RH_IGNORE){
                             path=(path)?path:'...'; moduleName=(moduleName)?moduleName:'...';
@@ -163,38 +144,21 @@ module.exports.sb0=async(client,target_module,path,moduleName)=>{try{
 
 }catch(err){console.log(err)};};
 //________________________________________________
-//________________________________COMMAND_________
-//_________________SET_COMMANDS
-module.exports.setCommand=async(client,path,from)=>{try{
-   if (!module.exports.commands) return;
-   await exports.delay(1000);
-   if(from=='external') {
-     module.exports.external_module.map(m=>module.exports.sc0(client,m,'..external..',m.name)); return;
-   };//if external end
-   module.exports.apply(client,path,module.exports.sc0);
-}catch(err){console.log(err)};};//setCommand end
-//____________________sc0
-module.exports.setSome=async(client,path,from,type,funcName)=>{try{
-   //let type="commands"; let funcName = 'sc0';
-   if (!module.exports[type]) return;
-   await exports.delay(1000);
-   if(from=='external') {
-     module.exports.external_module.map(m=>module.exports[funcName](client,m,'..external..',m.name)); return;
-   };//if external end
-   module.exports.apply(client,path,module.exports[funcName]);
-}catch(err){console.log(err)};};//setCommand end
-//_____
+//___________________________
 
+
+//_________________SET_COMMANDS
+//____________________sc0
 module.exports.sc0=async(client,target_module,path,moduleName)=>{try{
-        if(!target_module.RH_IGNORE_TOTAL&&!!target_module.commands&&!target_module.RH_IGNORE_COMMANDS){    
+       // if(!target_module.RH_IGNORE_TOTAL&&!!target_module.commands&&!target_module.RH_IGNORE_COMMANDS){    
                         
                        for(let key in target_module.commands){
                              let commandName = key; 
-                             if(!target_module.commands[key].RH_IGNORE){
+                             if(!target_module.commands[key].disable){
                                  if(!!target_module.commands[key].aliase){commandName=target_module.commands[key].aliase.slice();};
                           
-                                 (client.rh)?{}:client.rh={};
-                                 (client.rh.commands)?{}:client.rh.commands={};
+                                // (client.rh)?{}:client.rh={};
+                                 //(client.rh.commands)?{}:client.rh.commands={};
                                  client.rh.commands[commandName]=(client.rh.commands[commandName])?client.rh.commands[commandName]:[];
                                  let cmd = {exe:target_module.commands[key].run};
                                  client.rh.commands[commandName].push(cmd);
@@ -203,33 +167,12 @@ module.exports.sc0=async(client,target_module,path,moduleName)=>{try{
                                  if(module.exports.log) console.log('COMMAND SET.../'+path+'/'+moduleName+'/'+commandName);
                              };//if on is true;
                       };//for end
-                  };//module is not ignored
+                //  };//module is not ignored
 
 }catch(err){console.log(err)};};
 
 //_____________________________________EVENT
 //_____________________SET_EVENTS
-module.exports.setEvent=async(client,path,from)=>{try{
-   if(!module.exports.events) return;
-   await exports.delay(1000);
-   let fs = require('fs');
-   if(from=='external'){
-        module.exports.external_module.map(m=>module.exports.se0(client,m,'..external..',m.name));
-        return;
-   };//if external end
-   fs.readdir(path+"/", (err, files) => {try{
-      if (err) return console.error(err);
-      files.forEach(file => {try{
-            let target_module = require(`${path}/${file}`);
-            
-            let moduleName = file.split(".")[0];
-            module.exports.se0(client,target_module,path,moduleName);
-        }catch(err){console.log(err);};});//if end
-   }catch(err){console.log(err);};});//event trigger
-  
-}catch(err){console.log(err)};};//setModuleEvents end
-//____________________se0
-
 module.exports.se0=async(client,target_module,path,moduleName)=>{try{
          
           
@@ -245,37 +188,16 @@ module.exports.se0=async(client,target_module,path,moduleName)=>{try{
 
 }catch(err){console.log(err)};};
 
-//_____________________________________EVENT_PRIMITIVE
-//_____________________SET_EVENTS
-module.exports.setEvent_primitive=async(client,path,from)=>{try{
-   if(!module.exports.primitive_events) return;
-   await exports.delay(1000);
-   let fs = require('fs');
-    if(from=='external'){
-        module.exports.external_module.map(m=>module.exports.sep0(client,m,'..external..',m.name)); return;
-   };//if external end
-   fs.readdir(path+"/", (err, files) => {try{
-      if (err) return console.error(err);
-      files.forEach(file => {try{
-            let target_module = require(`${path}/${file}`);
-            
-            let moduleName = file.split(".")[0];
-            module.exports.sep0(client,target_module,path,moduleName);
-       }catch(err){console.log(err);};});//if end
-   }catch(err){console.log(err);};});//event trigger
-  
-}catch(err){console.log(err)};};//setModuleEvents end
 
-//____________________sep0
-
+//_____________________SET_EVENTS_PRIMITIVE
 module.exports.sep0=async(client,target_module,path,moduleName)=>{try{
          
           
                if(!target_module.RH_IGNORE_TOTAL&&!!target_module.events_primitive&&!target_module.RH_IGNORE_EVENTS_RIMITIVE){
                   for(let key in target_module.events_primitive){  
                       if(!target_module.events_primitive[key].RH_IGNORE){
-                            if(!client.events_primitive[key]) client.events_primitive[key]=[];
-                            client.events_primitive[key].push(target_module.events_primitive[key]);
+                            if(!client.rh.events_primitive[key]) client.rh.events_primitive[key]=[];
+                            client.rh.events_primitive[key].push(target_module.events_primitive[key]);
                             
                             path=(path)?path:'...'; moduleName=(moduleName)?moduleName:'...';
                             if(module.exports.log) console.log('EVENT  PRIMITIVE SET .../'+path+'/'+moduleName+'/'+key);
@@ -286,7 +208,7 @@ module.exports.sep0=async(client,target_module,path,moduleName)=>{try{
 
 }catch(err){console.log(err)};};
 
-//____________fetchMessages
+//____________FETCH_MESSAGES_IF_NEED
 module.exports.fetchMessages={ on:true,  run:async(client,id)=>{try{
      if(!module.exports.fetch_messages) return;
      if(module.exports.log) console.log('fetching messages');
@@ -312,9 +234,10 @@ module.exports.fetchMessages={ on:true,  run:async(client,id)=>{try{
 
 }catch(err){console.log(err);};}};//
 
-//____________fetchMembers
+//____________FETCH_MEMBERS_IF_NEED
 module.exports.fetchMembers={ on:true,  run:async(client,id)=>{try{
      if (!module.exports.fetch_members) return;
+     if(!module.exports.server_id){return console.log('server id not defined for fetching members from');};
      let server=await client.guilds.get(module.exports.server_id);
       if(!server) return;
       if(module.exports.log) console.log('Fetching members from server '+server.name);
@@ -325,56 +248,12 @@ module.exports.fetchMembers={ on:true,  run:async(client,id)=>{try{
 
 }catch(err){console.log(err);};}};//
 
-//____________test
-module.exports.test={ on:true,  run:async()=>{try{
-        
-      let str='RH test';
-      return str;
-
-}catch(err){console.log(err);};}};//
 //-------------------
-module.exports.load_all=async(client,folder_name)=>{try{
-         
-   // await module.exports.setBoot(client,folder_name,'folder');
-    //await module.exports.setBoot(client,folder_name,'external');
-    await module.exports.setSome(client,folder_name,'folder','boots','sb0');
-   // await module.exports.setCommand(client,folder_name,'external');
-  await module.exports.setSome(client,folder_name,'folder','commands','sc0');
- //   await  module.exports.setEvent(client,folder_name,'folder'); 
-   // await  module.exports.setEvent(client,folder_name,'external');
-    await module.exports.setSome(client,folder_name,'folder','events','se0');
- //   await  module.exports.setEvent_primitive(client,folder_name,'folder'); 
-   // await  module.exports.setEvent_primitive(client,folder_name,'external');
-  await module.exports.setSome(client,folder_name,'folder','events_primitive','sep0');
-               
-}catch(err){console.log(err)};};
 
-module.exports.apply=async(client,path,func)=>{try{
-       
-   function apply(path,func){
-  fs.readdir(path+"/", (err, files) => {try{
-   //if (err) return console.error(err);
-    files.forEach(file=> {try{ 
-      
-            let path1=`${path}/${file}`;
-            let isDir = fs.existsSync(path1) && fs.lstatSync(path1).isDirectory();
-            if(isDir) { return apply(path1,func); };
-            let target_module = require(`${path}/${file}`);
-            
-            let moduleName = file.split(".")[0];
-            func(client,target_module,path,moduleName);
-            
-     }catch(err){console.log(err);};});//forEach end
-    
-  }catch(err){console.log(err);};
-  });//event trigger
-  };//--appply
-            return apply(path,func);
-}catch(err){console.log(err)};};
 
 module.exports.buildRh=async(client)=>{try{
   client.rh={};
-    client.rh.commands=[];//array for storing commands
+    client.rh.commands={};//array for storing commands
 client.rh.env={};//obj for storing envorimentals
 client.rh.meth={};//obj for storing methods
 client.rh.delay = module.exports.delay;
@@ -383,7 +262,7 @@ client.rh.mod={};
 client.rh.mod.raw={};
 client.rh.mod.raw.rateLimit=0;
 client.rh.mod.raw.rateLimitDate=0;
-    
+ client.rh.events_primitive={};   
          
 }catch(err){console.log(err)};};
 
