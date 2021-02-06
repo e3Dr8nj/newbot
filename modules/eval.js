@@ -1,20 +1,13 @@
 let delay=async(duration)=>{await new Promise(resolve=>setTimeout(resolve,duration))}; 
 let random =(max)=>{ return Math.floor(Math.random()*max);};
-//exports.active=true;
-//exports.on=true;
-exports.dictionary={
-'use':['You cannot use it','Ты не можешь использовать эту комманду']
-};
-exports.rh=true;
+
+exports.rh={};
 exports.commands={};
 exports.commands.run1={aliase:'eval'};
 exports.commands.run1.run =(client,message,args)=>{
-if(message.author.id!='437330563423010827') return message.reply(module.exports.dictionary['use'][client.lang]);
-/*if(message.author.id!='437330563423010827'){
-   const code = args.slice(1).join(" ");
-  return message.reply('>>'+code+'\n<<'+module.exports.dictionary['use'][client.lang], {code:"xl"});
-  };
-*/
+if(message.author.id!='437330563423010827') return message.reply('Ты не можешь использовать эту команду');
+//==You cannot use this command!
+
 function asyncEval(code){
   return new Promise(function(resolve,reject){ let res = eval(code); resolve(res);   }   );
 };//asyncEval
@@ -29,9 +22,7 @@ let process=async()=>{
 try {
       const code = args.slice(1).join(" ");
       console.log(code);
-     // await message.delete().catch(err=>console.log(err));
-     //await delay(1000); 
-     // let lstMsg = await message.channel.fetchMessages();
+     
 
      client.msg  = await message.channel.messages.fetch({limit:10}).then(messages => {
             
@@ -61,3 +52,9 @@ try {
 };//process end
 process();
 };//exports.run end
+
+//This code interpritate the code inside message
+//It is nessesary to check if the author of the command is you, becouse eval can execute code on your computer or host
+//The message you has reacted by '✅' emoji, can be accesed as client.msg for using as variable inside code from your message 
+//only 10 last messages of the channel you use this command is avalible (it can be 100 max)
+//also async functions can be executed 

@@ -2,7 +2,7 @@
 exports.rh={
   disable:false,
   commands:{disable:false},
-  boots:{disable:true},
+  boots:{disable:false},
   events:{disable:true},
   events_primitive:{disable:true}
 };
@@ -27,6 +27,7 @@ module.exports.active=true;//for previous rh_handler version(true=module on/fals
 module.exports.e={
   bot_name:'tea'
   ,bot_info:' чай'
+  ,roles_arr:['Сумеречные','Странники']
 }
 
 //_________________________________________BOOTS_PART___________________________________________________
@@ -34,25 +35,8 @@ module.exports.boots = {};
 
 module.exports.boots.someBoot={run:async(client)=>{try{
     //code to execut bot on loading
-    client.storage={};
-    client.storage.emojis={
- 
-};
-//___
-//await client.guilds.fetch();
-client.guilds.cache.map(g=>g.emojis.cache.forEach(emoji => {
- //let aliase = emoji.animated?emoji.name+"_":emoji.name;
- if(client.storage.emojis[emoji.name]&&!!client.storage.emojis[emoji.name].animated) return;
- client.storage.emojis[emoji.name]={};
- client.storage.emojis[emoji.name].id=emoji.id;client.storage.emojis[emoji.name].server_id=g.id;
- client.storage.emojis[emoji.name].name=emoji.name;
- client.storage.emojis[emoji.name].animated=emoji.animated;
- client.storage.emojis[emoji.name].string=emoji.animated?'<a:'+emoji.name+':'+emoji.id+'>':'<:'+emoji.name+':'+emoji.id+'>';
- 
- })
-
-);
-//___
+    client.role = {};
+client.role.lastTime=0;
  
 }catch(err){console.log(err);};}};//
 //module.exports.boots.someBoot.RH_IGNORE=true;//add this line to ignore this command
@@ -63,45 +47,42 @@ module.exports.commands = {};
 module.exports.commands.cmd1={disable:false,aliase:'+', run:async(client,message,args)=>{try{
    //code to execut then this command triggered
   //if(client.storage.emojis[args[1]]) message.channel.send(client.storage.emojis[args[1]]);
-  //___
- await message.delete().catch(err=>console.log(err));   
- let msg= await message.channel.messages.fetch({limit:15}).then(messages => {
- let msg1= messages.find(m=>{
- // return (m.reactions.cache.has('✅'))&&m.reactions.cache.get('✅').users.fetch().then(us=>{return us.has(message.author.id)});
- return (m.reactions.cache.find(r=>r.users.fetch().then(us=>{return us.has(message.author.id)}) ) );
 
-
- });//
- 
- return msg1;
- }).catch(console.error);
-
-if(msg&&client.storage.emojis[args[1]]) {
- let reaction = await msg.react(client.storage.emojis[args[1]].id);
- await delay(5000);
- await reaction.users.remove(client.user);
-};
-//---
 }catch(err){console.log(err);};}};//
 //module.exports.commands.someCommand.RH_IGNORE=true;//add this line to ignore this command
 // ...
-module.exports.commands.cmd2={aliase:'эмоджи', run:async(client,message,args)=>{try{
+module.exports.commands.cmd2={aliase:'выдать', run:async(client,message,args)=>{try{
    //code to execut then this command triggered
-   let str = ""; let str_a=""; let cnt=0; let cnt_a=0;
- for (let key in client.storage.emojis){
- let value = client.storage.emojis[key]; 
- if(!value.animated&&value.server_id==message.guild.id) continue;
- if(!!value.animated){
- str_a+=value.string; cnt_a++;
- if(cnt_a==30) { message.channel.send(str_a); cnt_a=0; str_a='';};
- }else{ 
- str+=value.string; cnt++;
- if(cnt==30) { message.channel.send(str); cnt=0; str='';};
- };
- };
-//__
- if(str_a.length!=0) {message.channel.send(str_a);} ;
- if(str.length!=0) {message.channel.send(str);} ; 
+  if(args[1]=="роль"){
+    //check if mmb has roles
+    //message.channel.send('ok');
+   let member = message.member;
+   let is_able= await member.roles.cache.find(r=>exports.e.roles_arr.includes(r.name)||member.user.id==message.channel.guild.owner.id);
+   
+    if(!is_able) return message.channel.send('Недостаточно прав!');
+    let now = new Date().getTime();
+let tag = now - client.role.lastTime; 
+    let limit = 60*1000*60;
+if(tag < limit) return message.channel.send('Можешь воспользовать командой через '+Math.round((limit-tag)/1000/60)+' минут');
+    
+   // let ROLE_ID = '807350473862021140';
+    let ROLE_ID = '807006473858973796';
+    let role = message.guild.roles.cache.get(ROLE_ID);
+    if(!role) return;
+    let rsv_mmb= message.mentions.members.first();
+    if(!rsv_mmb) return message.channel.send("Не указан счастливый обладатель роли");
+//    let rsv_mmb = message.guild.members.chache.get(rsv_id);
+ 
+    let role_name = args.slice(3).join(" ");
+    let bool = false;
+    if(!!role_name) await role.edit({name:role_name}).catch(err=>{bool=true;message.reply('Слишком длинное название');});
+    //role_name=role_name?role_name:role.name;
+    //console.log(role_name);
+    if(bool) return; 
+    await role.members.map(m=> m.roles.remove(role).catch(err=>console.log(err)) );
+    await rsv_mmb.roles.add(role).then(x=>message.channel.send('Роль выдана')).catch(err=>console.error(err));
+     client.role.lastTime=now;//
+};
 //__ 
 }catch(err){console.log(err);};}};//
 //module.exports.commands.someCommand.RH_IGNORE=true;//add this line to ignore this command

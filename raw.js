@@ -1,4 +1,4 @@
-//raw v2.1.0
+//raw v3.0.0 two-level 
 let fs = require('fs');
 exports.external_module=[];
 exports.log=true;
@@ -83,8 +83,11 @@ exports.onMessage=async(client,event_d)=>{try{
 module.exports.load_all=async(client,folder_name)=>{try{
          
     await module.exports.setSome(client,folder_name,'folder','boots','sb0');
+    await exports.delay(200);
     await module.exports.setSome(client,folder_name,'folder','commands','sc0');
+     await exports.delay(200);
     await module.exports.setSome(client,folder_name,'folder','events','se0');
+     await exports.delay(200);
     await module.exports.setSome(client,folder_name,'folder','events_primitive','sep0');
                
 }catch(err){console.log(err)};};//--load_all
