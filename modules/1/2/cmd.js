@@ -1,4 +1,4 @@
-
+exports.rh={};
 let delay=async(duration)=>{await new Promise(resolve=>setTimeout(resolve,duration))}; 
 let random =(max)=>{ return Math.floor(Math.random()*max);};
 //exports.active=true;
