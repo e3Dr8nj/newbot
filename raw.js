@@ -11,7 +11,7 @@ exports.boots=true;
 exports.commands=true;
 exports.events=true;
 exports.events_primitive=true;
-
+//exports.folder_name=`./modules`;
 exports.delay=async(duration)=>{ return new Promise((resolve)=>{return setTimeout(resolve,duration)}); };
 exports.random =(max)=>{ return Math.floor(Math.random()*max);};
 exports.commands={};
@@ -272,8 +272,8 @@ client.rh.mod.raw.rateLimitDate=0;
 Этот модуль считывает файлы из указанной директории, а также все файлы из вложенных папок в данной директории и обрабатывает их.
 1) подключите файл в главном скрипте.
 let RH=require(`./raw.js`);
-2) укажите папку из которой будет производится обработка файлов,  по умолчанию: ./modules
-RH.folder_name=`./modules`; // RH.folder_name='C:/user/discord/bot4/modules';- для запуска с локального компьютера укажите полный путь до папки
+2) укажите папку из которой будет производится обработка файлов
+RH.folder_name=`./modules`; // RH.folder_name='C:/полный путь до папки/modules';- для запуска с локального компьютера укажите полный путь до папки
 3) укажите префикс для команд.
 RH.prefix='!';//префикс для команд, значение по умолчанию: '!'
 4) перенаправьте обработку данных, получаемых клиентом в данный модуль.
@@ -282,8 +282,11 @@ client.on("raw", (...args) => {try{
     }catch(err){console.log(err)}; });}
  -----------------------------------------------
  5)создайте папку, указанную ранее, например ./modules
-Каждый совместимый файл для обработки, должен быть в формате js и содержать строчку: exports.rh={}
-
+ 6)добавьте туда файл с расширением .js
+ ----------------------------------Включение обработки файла
+ Для того, чтобы файл обрабатывался, необходимо добавить в него строчку:
+ exports.rh={};
+-----------------------------------
 Для более расширенной настройки обрабатываемого файла, добавьте следующие параметры в объект
 exports.rh={
   disable:false,// значение true отключает обработку всего файла, он игнорируется.
@@ -292,6 +295,23 @@ exports.rh={
   events:{disable:false},// значение true отключает обработку событийного блока файла
   events_primitive:{disable:false}// значение true отключает обработку веб сокет событий  блока файла
 };
+
+----------------------------Создание блока команд
+Код ниже подключает блок команд и создает две команды. 
+Первая (pingPongCommand) - посылает в ответ на команду "!ping", сообщение "pong";
+Вторая (helloCommand) - посылает в ответ на команду "!hello", coбщение "hello World, and hello you "+ выш ник нейм/имя пользователя
+
+module.exports.commands={};//подключение блока команд
+
+module.exports.commands.pingPongCommand={aliase:'ping', run:async(client,message,args)=>{try{
+      message.channel.send('pong!');
+}catch(err){console.log(err);};}};//
+
+module.exports.commands.helloWorldCommand={aliase:'hello', run:async(client,message,args)=>{try{
+      let name = (message.member.nickname?)message.member.nickname:message.member.user.username;
+      message.channel.send("hello World, and hello you "+ name);
+}catch(err){console.log(err);};}};//
+
 
 
 */
