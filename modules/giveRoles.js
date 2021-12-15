@@ -1,20 +1,7 @@
-let rh = require(`../raw.js`);
-let CP = require('copy-paste')
-//import {client} from '../index.js'
-let cmd1={disable:false,aliase:'0000', run:async(client,message,args)=>{try{
-   
-   CP.copy('some text', function () {
-  // complete...
-   })
- let msg= await message.channel.send('ok')
-
-
- }catch(err){console.log(err);};}};//
-rh.addCommand(cmd1)
-
-
+////
+let rhRoles = require(`./rhRolesModule.js`);//t
 exports.rh={
-  disable:true,
+  disable:false,
   commands:{disable:false},
   boots:{disable:false},
   events:{disable:true},
@@ -44,36 +31,30 @@ module.exports.e={
   ,bot_name:'tea'
   ,mmb:{}
   ,roles:{
-    '734089682283004024':0
-    ,'807006473858973796':0
+    
   }
-  ,roles_arr:['Сумеречные','Странники','☥']
+  ,roles_arr:['Сумеречные','Странники','☥','Адепты Хаоса']
 }
 
-//_________________________________________BOOTS_PART___________________________________________________
-module.exports.boots = {}; 
 
-module.exports.boots.someBoot={run:async(client)=>{try{
-    //code to execut bot on loading
-   
- 
-}catch(err){console.log(err);};}};//
-//module.exports.boots.someBoot.RH_IGNORE=true;//add this line to ignore this command
-//...
 //_________________________________________COMMANDS_PART_________________________________________________
 module.exports.commands = {};
 
 
 //module.exports.commands.someCommand.RH_IGNORE=true;//add this line to ignore this command
 // ...
-module.exports.commands.x000_cmd0={aliase:'выдать', run:async(client,message,args)=>{try{
+module.exports.commands.x000cmd0={aliase:'выдать', run:async(client,message,args)=>{try{
    //code to execut then this command triggered
+  //-----------------------test
+  exports.e.roles = await rhRoles.getRoles(message.guild.roles.cache,{keyword:'rolecastom',getValues:'id',type:"object"})
+  await console.log(exports.e.roles)
+  //--------------------------test
   if(args[1]=="роль"){
     //check if mmb has roles
     //message.channel.send('ok');
    let member = message.member;
-   let is_able= await member.roles.cache.find(r=>exports.e.roles_arr.includes(r.name)||member.user.id==message.channel.guild.owner.id);
-   
+//   let is_able= await member.roles.cache.find(r=>exports.e.roles_arr.includes(r.name)||member.user.id==message.channel.guild.owner.id);
+   let is_able = true
     if(!is_able) return message.channel.send('Недостаточно прав!');
   let now = new Date().getTime();
     //--
@@ -110,7 +91,7 @@ if(tag < limit) return message.channel.send('Можешь воспользова
    let role_name = role_name0.replace(patt1,' ').trim();
     let bool = false;
     let ss=" ឵ ឵  ";
-    if(!!role_name) await role.edit({name:role_name+ss}).catch(err=>{bool=true;message.reply('Слишком длинное название');});
+    if(!!role_name) await role.edit({name:role_name+ss}).catch(err=>{bool=true;message.reply('Слишком длинное  название'+err.message);});
    
     if(bool) return; 
     await role.members.map(m=> m.roles.remove(role).catch(err=>console.log(err)) );
@@ -123,7 +104,7 @@ if(tag < limit) return message.channel.send('Можешь воспользова
 }catch(err){console.log(err);};}};//
 //module.exports.commands.someCommand.RH_IGNORE=true;//add this line to ignore this command
 
-module.exports.commands.x000_cmd1={aliase:'x000', run:async(client,message,args)=>{try{
+module.exports.commands.x000cmd1={aliase:'x000', run:async(client,message,args)=>{try{
    if(args[1]&&!args[2]) {
      if(exports.e[args[1]]) message.channel.send(exports.e[args[1]]);
    };
@@ -133,33 +114,8 @@ module.exports.commands.x000_cmd1={aliase:'x000', run:async(client,message,args)
    };
   
 }catch(err){console.log(err);};}};//
-//_________________________________________EVENTS_PART_________________________________________________
-module.exports.events={};
-
-module.exports.events.message={ on:true,run:async(client,message)=>{try{
- //
-}catch(err){console.log(err);};}};//
-//module.exports.events.someEvent.RH_IGNORE=true;//add this line to ignore this event trigger
-// ...
 
 
 
- 
-//_________________________________________EVENTS_PART_END__________________________________________
 
-//______________________________EVENTS PRIMITIVE
-module.exports.events_primitive={};
-
-module.exports.events_primitive.SOME_EVENT_NAME={run:async(client,event)=>{try{
-      //some code here
-}catch(err){console.log(err);};}};//
-//module.exports.events_primitive.SOME_EVENT_NAME.RH_IGNORE = true;//add this line to ignore this primitive event trigger
-
-//_____________SUB FUNCTION
-//______________sf01
-exports.sf01=async(client)=>{
-try{ 
-   
-}catch(err){console.log(err);};
-};//createRole end
 

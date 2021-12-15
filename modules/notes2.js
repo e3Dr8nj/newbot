@@ -1,7 +1,7 @@
 
 exports.rh={
- // disable:,true//uncomment for disable all this file
- // commands:{disable:true} //uncomment fro disable commands etc.
+ disable:true//uncomment for disable all this file
+ // ,commands:{disable:true} //uncomment fro disable commands etc.
   //,boots:{disable:true}
   //,events:{disable:true}
   //,events_primitive:{disable:true}
@@ -28,8 +28,9 @@ module.exports.e={
 //_________________________________________COMMANDS_PART_________________________________________________
 module.exports.commands = {};
 //--------
-module.exports.commands.command1={disable:false,aliase:'cmd1', run:async(client,message,args)=>{try{
+module.exports.commands.command1={disable:false,aliase:'notes2', run:async(client,message,args)=>{try{
    //code to execut then this command triggered
+  message.channel.send('+notes2')
 }catch(err){console.log(err);};}};//
 //--------
 module.exports.commands.command2={disable:false,aliase:'cmd2', run:async(client,message,args)=>{try{
@@ -59,4 +60,3 @@ try{
    
 }catch(err){console.log(err);};
 };//
-

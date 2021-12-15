@@ -1,9 +1,9 @@
 
 exports.rh={
-  disable:false,
+  disable:true,
   commands:{disable:false},
   boots:{disable:true},
-  events:{disable:true},
+  //events:{disable:true},
   events_primitive:{disable:true}
 };
 
@@ -112,10 +112,23 @@ module.exports.events={};
 
 module.exports.events.message={ on:true,run:async(client,message)=>{try{
  //
+  message.channel.send('d');
 }catch(err){console.log(err);};}};//
 //module.exports.events.someEvent.RH_IGNORE=true;//add this line to ignore this event trigger
 // ...
-
+module.exports.events.message={ run:async(client,message)=>{try{
+   //code to execut then this command triggered
+   if(message.channel.type=='dm' || message.author.bot) return;
+   if(!message.content.startsWith('!')) return;
+   let nc = message.content.slice(1);
+   
+   let msg = await message.channel.send('@septapus comic '+nc);
+   await msg.delete();
+   await message.delete();
+   
+}catch(err){console.log(err);};}};//
+//module.exports.commands.someCommand.RH_IGNORE=true;//add this line to ignore this command
+// ...
 
 
  

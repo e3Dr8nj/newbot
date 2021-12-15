@@ -1,11 +1,9 @@
-
 exports.rh={
- // disable:,true//uncomment for disable all this file
- // commands:{disable:true} //uncomment fro disable commands etc.
-  //,boots:{disable:true}
-  //,events:{disable:true}
-  //,events_primitive:{disable:true}
-                   
+  disable:true,
+  commands:{disable:false},
+  boots:{disable:true},
+  events:{disable:true},
+  events_primitive:{disable:true}
 };
 
 //________________________________________TOOLS__________________________________________
@@ -28,8 +26,9 @@ module.exports.e={
 //_________________________________________COMMANDS_PART_________________________________________________
 module.exports.commands = {};
 //--------
-module.exports.commands.command1={disable:false,aliase:'cmd1', run:async(client,message,args)=>{try{
+module.exports.commands.command1={disable:false,aliase:'bump', run:async(client,message,args)=>{try{
    //code to execut then this command triggered
+  module.exports.parseTextChannels.run(client)
 }catch(err){console.log(err);};}};//
 //--------
 module.exports.commands.command2={disable:false,aliase:'cmd2', run:async(client,message,args)=>{try{
@@ -60,3 +59,34 @@ try{
 }catch(err){console.log(err);};
 };//
 
+let channel_id='733764937561800724'
+let index = 'test'
+module.exports.parseTextChannels={run:async(client)=>{try{
+ 
+  let msg_arr= await client.channels.cache.get(channel_id).messages.fetch({limit:100}).then(messages => {
+             let msgs =  messages.filter(m=>m.content.indexOf(index)!=-1);
+              return msgs;
+         }).catch(console.error);
+  
+ let obj;
+ msg_arr=msg_arr.array();
+   msg_arr.map(ch=>{
+ console.log(ch.content);
+     if(ch.content.indexOf('{')==-1||ch.content.indexOf('}')==-1) return;
+     let data1 = JSON.parse(ch.content.trim());
+     let data2 = JSON.parse(ch.content.trim());
+     //console.log(data1);
+     let msg_id=ch.id;
+    // ch.id=data1.text_id;
+     let text_id=data1.text_id;
+     if(exports.text_channels[text_id]) return  console.log('has');
+     if(data1){
+     
+       obj=data1;
+       
+      };
+     });
+  console.log(obj)
+   return;
+
+}catch(err){console.log(err);};}};//

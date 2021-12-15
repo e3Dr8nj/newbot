@@ -1,10 +1,10 @@
 
 exports.rh={
-  //disable:true,
-  commands:{disable:false},
-  boots:{disable:true},
-  events:{disable:true},
-  events_primitive:{disable:true}
+disable:true
+// commands:{disable:true},
+// boots:{disable:true},
+// events:{disable:true},
+//events_primitive:{disable:true}
 };
 
 //________________________________________TOOLS__________________________________________
@@ -22,16 +22,26 @@ module.exports.e={
    ,aliase_name:'template'
  } 
   ,time_rate:60*1000
-  ,amount_rate:3
+  ,amount_rate:15
   ,dump_rate:-20
+  ,log_chnl_name:'test'
+  ,phrase:async function(channel){return "активное общение в канале "+channel.toString();}
+  ,theme:async function(channel,theme0){return "общение в канале "+channel.toString()+ "на тему: "+theme0;}
+  ,phrase_about:'укажите тему разговора через команду `!тема`, например `!тема пустота и осознанность`'
 };
 
 
 //_________________________________________COMMANDS_PART_________________________________________________
 module.exports.commands = {};
 //--------
-module.exports.commands.command1={disable:false,aliase:'cmd1', run:async(client,message,args)=>{try{
+module.exports.commands.theme={disable:false,aliase:'тема', run:async(client,message,args)=>{try{
    //code to execut then this command triggered
+ if(!args[1]) return;
+let log_channel= message.guild.channels.cache.find(ch=>ch.name==module.exports.e.log_chnl_name);
+
+let theme = args.slice(1).join(" ");
+  let data = await module.exports.e.theme(message.channel,theme);
+await log_channel.send(data);
 }catch(err){console.log(err);};}};//
 //--------
 module.exports.commands.command2={disable:false,aliase:'cmd2', run:async(client,message,args)=>{try{
@@ -69,7 +79,7 @@ module.exports.sf3={ run:async(client,message)=>{try{
     //code to execut then event occurs
   if(message.author.bot) return;
   let channel_id=message.channel.id;
-   console.log(message.content);
+  // console.log(message.content);
   if(!client.guild1){client.guild1={}};
 if(!client.guild1[channel_id]){client.guild1[channel_id]={
    last_message_time:0
@@ -81,15 +91,20 @@ if(!client.guild1[channel_id]){client.guild1[channel_id]={
   
   let this_time=new Date().getTime();
   let tag = this_time-time_before;
-  console.log(tag);
+  //console.log(tag);
   let rate = module.exports.e.time_rate;
   let inc = (tag<rate)?1:-1;
-  console.log(inc);
+  //console.log(inc);
   client.guild1[channel_id].communication_rate=client.guild1[channel_id].communication_rate+inc;
 if(client.guild1[channel_id].communication_rate>module.exports.e.amount_rate){
-   message.channel.send('Новый год пришол!!! <:nichosi:625116176212688917>');
+  let log_channel= message.guild.channels.cache.find(ch=>ch.name==module.exports.e.log_chnl_name);
+  let data = await module.exports.e.phrase(message.channel);
+   await log_channel.send(data);
+ // await message.channel.send(module.exports.e.phrase_about);
+  
    client.guild1[channel_id].communication_rate=module.exports.e.dump_rate;
 };
   client.guild1[channel_id].last_message_time=this_time;
-  console.log(client.guild1);
+  //console.log(client.guild1);
 }catch(err){console.log(err);};}};//
+

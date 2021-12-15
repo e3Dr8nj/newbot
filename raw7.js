@@ -16,9 +16,9 @@ exports.events_primitive=true;
 exports.delay=async(duration)=>{ return new Promise((resolve)=>{return setTimeout(resolve,duration)}); };
 exports.random =(max)=>{ return Math.floor(Math.random()*max);};
 exports.commands={};
-let client = {}
-exports.build= async(client1)=>{try{
-  client=client1
+
+exports.build= async(client)=>{try{
+  
   console.log('on')
 client.on("raw", (...args) => {
   try {
@@ -82,15 +82,11 @@ if(tag>0) {
 
 exports.onMessage=async(client,event_d)=>{try{
  //every time, then user send the message that starts with prefix, it finds a command and execute it
-  // if(event_d.author.id==client.user.id){return;}; 
+   if(event_d.author.id==client.user.id){return;}; 
    let channel=client.channels.cache.get(event_d.channel_id);
    if(channel.type=='dm'){if (module.exports.dm_commands==false) return;};//
-  //__________________________----031221
-   let message = await channel.messages.fetch(event_d.id).then(collected=>{return collected;}).catch(err=>{});
-  if(!message) return
-  //-------------------
-    if((event_d.author.id==client.user.id)&&!message.content.startsWith('xxx')){return;};//-------
-  let args = message.content.slice(module.exports.prefix.length).trim().split(/ +/g);
+   let message = await channel.messages.fetch(event_d.id).then(collected=>{return collected;});
+   let args = message.content.slice(module.exports.prefix.length).trim().split(/ +/g);
    let cmd_name = args[0];
    if(client.rh.commands[cmd_name]){
    
@@ -173,21 +169,6 @@ module.exports.sb0=async(client,target_module,path,moduleName)=>{try{
 
 
 //_________________SET_COMMANDS
-module.exports.addCommand=async(command)=>{try{
-       // if(!target_module.RH_IGNORE_TOTAL&&!!target_module.commands&&!target_module.RH_IGNORE_COMMANDS){    
-                                 
-                                 let commandName=command.aliase.slice();
-                          
-                                // (client.rh)?{}:client.rh={};
-                                 //(client.rh.commands)?{}:client.rh.commands={};
-                                 client.rh.commands[commandName]=(client.rh.commands[commandName])?client.rh.commands[commandName]:[];
-                                 let cmd = {exe:command.run};
-                                 client.rh.commands[commandName].push(cmd);
-
-                                 
-                            
-
-}catch(err){console.log(err)};};
 //____________________sc0
 module.exports.sc0=async(client,target_module,path,moduleName)=>{try{
        // if(!target_module.RH_IGNORE_TOTAL&&!!target_module.commands&&!target_module.RH_IGNORE_COMMANDS){    
@@ -195,18 +176,13 @@ module.exports.sc0=async(client,target_module,path,moduleName)=>{try{
                        for(let key in target_module.commands){
                              let commandName = key; 
                              if(!target_module.commands[key].disable){
-                               //
-                               module.exports.addCommand(target_module.commands[key])
-                               //
-                               /*
                                  if(!!target_module.commands[key].aliase){commandName=target_module.commands[key].aliase.slice();};
                           
-                               
+                                // (client.rh)?{}:client.rh={};
+                                 //(client.rh.commands)?{}:client.rh.commands={};
                                  client.rh.commands[commandName]=(client.rh.commands[commandName])?client.rh.commands[commandName]:[];
                                  let cmd = {exe:target_module.commands[key].run};
                                  client.rh.commands[commandName].push(cmd);
-                                 */
-                               
 
                                  path=(path)?path:'...'; moduleName=(moduleName)?moduleName:'...';
                                  if(module.exports.log) console.log('COMMAND SET.../'+path+'/'+moduleName+'/'+commandName);
@@ -258,19 +234,19 @@ module.exports.fetchMessages={ on:true,  run:async(client,id)=>{try{
      if(!module.exports.fetch_messages) return;
      if(module.exports.log) console.log('fetching messages');
            let ch_ids=[];
-           let server = client.guilds.cache.get(id);
+           let server = client.guilds.get(id);
            if(!server) return;
-           server.channels.cache.map(ch=>{
+           server.channels.map(ch=>{
              // console.log('from channel '+ch.name);
               ch_ids.push(ch.id);
             });//
             // console.log(ch_ids);
             for(let i=0;i<ch_ids.length;i++){
-                   let channel =  await server.channels.cache.get(ch_ids[i]); 
+                   let channel =  await server.channels.get(ch_ids[i]); 
                   
                    if (channel.type=='category'||channel.type==='voice') {continue;};  
                    if(module.exports.log) console.log('fetch messages from  '+server.name+'/'+channel.name);
-                   let msg_arr =  await channel.messages.fetch({limit:100}).then(messages=>{
+                   let msg_arr =  await channel.fetchMessages({limit:100}).then(messages=>{
                                return messages;
                    }).catch(err=>console.log(err.message));
          };//
@@ -283,10 +259,10 @@ module.exports.fetchMessages={ on:true,  run:async(client,id)=>{try{
 module.exports.fetchMembers={ on:true,  run:async(client,id)=>{try{
      if (!module.exports.fetch_members) return;
      if(!module.exports.server_id){return console.log('server id not defined for fetching members from');};
-     let server=await client.guilds.cache.get(module.exports.server_id);
+     let server=await client.guilds.get(module.exports.server_id);
       if(!server) return;
       if(module.exports.log) console.log('Fetching members from server '+server.name);
-            await server.members.fetch()
+            await server.fetchMembers()
               .then()
               .catch(console.error);
       return;
