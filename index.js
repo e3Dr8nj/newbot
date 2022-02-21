@@ -43,16 +43,20 @@ const client13 = new Discord13.Client({
 });
 //client13.prefix = "-";
 client13.SERVER_ID = "476431736813912064";
+
 let RH13 = require(`./raw.js`);
 RH13.folder_name = `./modules`; // RH.folder_name='C:/user/discord/bot4/modules';- for pc running
 //RH13.prefix = client13.prefix; //prefix for commands; default value: '!'
 RH13.build(client13)
+
 client13.x={
   ch:{
     transfer:'transfer'
+    ,log_id:'733764937561800724'
   }
 }
-
+client13.x.inputPrefix='x13'
+client13.x.rewirePrefix='rewx13'
 client13.login(process.env.TOKEN);
 
 client13.on('ready',guild=>{
@@ -66,4 +70,3 @@ client13.on('ready',guild=>{
   }
    consolelog(data)}
     })
-  

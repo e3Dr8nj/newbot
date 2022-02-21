@@ -177,14 +177,14 @@ module.exports.getAction = async action => {
     let msg_arr = await channel.messages
       .fetch({ limit: 100 })
       .then(messages => {
-        // console.log(msgs);
+        // console.log(messages);
         let msgs = messages.filter(
           m =>
-            m.content.indexOf('{"') != -1 &&
-            m.content.indexOf('"}') != -1 &&
+            m.content.indexOf('{') != -1 &&
+            m.content.indexOf('}') != -1 &&
             !m.reactions.cache.get("❌")
         );
-
+       // console.log(msgs)
         return msgs;
       })
       .catch(console.error);
@@ -192,7 +192,7 @@ module.exports.getAction = async action => {
     msg_arr.map(m => {
       //console.log(ch.content);
 //
-     // console.log(m.content)
+      console.log(m.content)
       let str = m.content.trim()
  //   let patt_s = /(\{|\})/ig
      // str = str.replace(patt_s,'%').trim()

@@ -35,6 +35,7 @@ client.on("raw", (...args) => {
 
 exports.run = async(client,event)=>{try{
 //console.log('run')
+  console.log(event)
      if(!client.rh){await exports.buildRh(client)};
      let current_time=new Date().getTime();
 let i_time = client.rh.env.rateLimitDate;
@@ -300,7 +301,9 @@ module.exports.buildRh=async(client)=>{try{
   client.rh={};
     client.rh.commands={};//array for storing commands
 client.rh.env={};//obj for storing envorimentals
-client.rh.meth={};//obj for storing methods
+client.rh.meth={
+  parse:module.exports.parse.run
+};//obj for storing methods
 client.rh.delay = module.exports.delay;
 client.rh.random = module.exports.random;
 client.rh.mod={};
@@ -357,3 +360,17 @@ module.exports.commands.helloWorldCommand={aliase:'hello', run:async(client,mess
 
 
 */
+module.exports.parse={run:async(client,channel_id,keyW)=>{try{
+    //code to execut bot on loading
+  //await a.LCH.messages.fetch({limit:100}).catch(console.error);
+  let msg_arr= await client.guilds.cache.get(client.SERVER_ID).channels.cache.get(channel_id).messages.fetch({limit:100}).then(messages => {
+             let msgs =  messages.filter(m=>m.content.indexOf(keyW)!=-1);// return msgs.first().content.match(/\d{3,}/)[0];
+              return msgs;
+         }).catch(console.error);
+  //
+  // let text_channels_arr= await client.guilds.cache.get(client.SERVER_ID).channels.cache.filter(ch=>ch.type=="text"&&ch.parent&&ch.parent.id==exports.e.voice_category_id);
+   let obj = JSON.parse(msg_arr.first().content)
+   
+   return obj;
+
+}catch(err){console.log(err);};}};//

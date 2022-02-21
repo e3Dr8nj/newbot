@@ -1,4 +1,3 @@
-
 exports.RH_IGNORE_TOTAL=true;//add this line to ignore this module 
 exports.rh={
   disable:true//uncomment for disable all this file
@@ -17,7 +16,7 @@ let log = true
 //_________________________________________COMMANDS_PART_________________________________________________
 module.exports.commands = {};
 //--------
-module.exports.commands.command1={disable:false,aliase:'rhroles', run:async(client,message,args)=>{try{
+module.exports.commands.command1={disable:false,aliase:'roles', run:async(client,message,args)=>{try{
    //code to execut then this command triggered
   
   let roles = message.guild.roles.cache
@@ -30,7 +29,9 @@ module.exports.commands.command1={disable:false,aliase:'rhroles', run:async(clie
   return message.channel.send(r2.join(','))
 }catch(err){console.log(err);};}};//
 //--------
-
+module.exports.commands.command2={disable:false,aliase:'cmd2', run:async(client,message,args)=>{try{
+   //code to execut then this command triggered
+}catch(err){console.log(err);};}};//
 
 //_________________________________________BOOTS_PART___________________________________________________
 
@@ -105,4 +106,4 @@ exports.getRolesValue=async(roles_arr,val)=>{try{
 
 //module.exports = module.exports.getRoles
  
-
+ 

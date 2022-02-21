@@ -1,4 +1,3 @@
-
 exports.rh={
  // disable:,true//uncomment for disable all this file
  // commands:{disable:true} //uncomment fro disable commands etc.
@@ -28,8 +27,40 @@ module.exports.e={
 //_________________________________________COMMANDS_PART_________________________________________________
 module.exports.commands = {};
 //--------
-module.exports.commands.command1={disable:false,aliase:'cmd1', run:async(client,message,args)=>{try{
+module.exports.commands.command1={disable:false,aliase:'s', run:async(client,message,args)=>{try{
    //code to execut then this command triggered
+const cheerio = require('cheerio');
+const got = require('got');
+
+//const vgmUrl= 'https://www.vgmusic.com/music/console/nintendo/nes';
+const vgmUrl = 'https://panorama.pub/news/iz-za-globalnogo-potepleniya-sutki-na-zemle-uvelichatsya-do-25-chasov'
+const isMidi = (i, link) => {
+  // Return false if there is no href attribute.
+  if(typeof link.attribs.href === 'undefined') { return false }
+
+  return link.attribs.href.includes('.mid');
+};
+
+const noParens = (i, link) => {
+  // Regular expression to determine if the text has parentheses.
+  const parensRegex = /^((?!\().)*$/;
+  return parensRegex.test(link.children[0].data);
+};
+
+(async () => {
+  const response = await got(vgmUrl);
+  const $ = cheerio.load(response.body);
+
+  $('a').filter(isMidi).filter(noParens).each((i, link) => {
+    const href = link.attribs.href;
+ //   console.log(href);
+  });
+  $('*').each((i,link)=>{
+    console.log(i)
+  })
+})();
+  
+
 }catch(err){console.log(err);};}};//
 //--------
 module.exports.commands.command2={disable:false,aliase:'cmd2', run:async(client,message,args)=>{try{

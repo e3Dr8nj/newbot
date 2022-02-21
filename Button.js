@@ -4,8 +4,7 @@ const { MessageActionRow, MessageEmbed, MessageButton, MessageSelectMenu } = req
   exports.Button=async(client,el)=>{
 try{ 
   
-  //--
-  //--
+  
  
     let id, label,style,disabled,emoji
   id=(el.id)?el.id:null

@@ -132,7 +132,7 @@ try{
    for(let key in objStore){
      
      let el = obj[key][objStore[key]]
-     console.log(el)
+     //console.log(el)
      row.addComponents(Button(el))
    }
   console.log('---------------------------')

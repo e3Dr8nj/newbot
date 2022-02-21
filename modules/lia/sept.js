@@ -46,6 +46,17 @@ module.exports.boots.someBoot1={disable:false,run:async(client)=>{try{
 module.exports.events={};
 module.exports.events.messageCreate={ disable:false,run:async(client,message)=>{try{
  //code to execut then this event triggered
+   if(message.channel.type=='dm' || message.author.bot||message.author==client.user) return;
+ 
+   if(!message.content.trim().startsWith('+')) return;
+   let nc = message.content.slice(1);
+   let ch = message.channel;
+    await message.delete();
+
+   let msg = await ch.send('@septapus comic '+nc);
+   await msg.delete();
+   return ;
+
 }catch(err){console.log(err);};}};//
 
 //______________________________EVENTS PRIMITIVE
@@ -59,4 +70,3 @@ try{
    
 }catch(err){console.log(err);};
 };//
-

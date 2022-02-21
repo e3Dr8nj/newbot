@@ -46,6 +46,24 @@ module.exports.boots.someBoot1={disable:false,run:async(client)=>{try{
 module.exports.events={};
 module.exports.events.messageCreate={ disable:false,run:async(client,message)=>{try{
  //code to execut then this event triggered
+  if(message.content.startsWith(client.x.rewirePrefix)) {
+    let m_arr = message.content.split("$")
+    let channel_id=m_arr[1]
+    let mmb_id = m_arr[2]
+    let data = m_arr[3]
+    let content = m_arr[4]
+    
+    let channel= await message.guild.channels.cache.get(channel_id)
+     let mmb = await message.guild.members.fetch(mmb_id)
+     if((!channel||!mmb)&&content) return message.channel.send(content)
+    
+     
+    return channel.send(mmb.toString()+" "+content)
+    
+  }
+    
+   
+  
 }catch(err){console.log(err);};}};//
 
 //______________________________EVENTS PRIMITIVE

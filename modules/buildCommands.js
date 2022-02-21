@@ -32,6 +32,13 @@ module.exports.commands = {};
 module.exports.commands.command1={disable:false,aliase:'bc', run:async(client,message,args)=>{try{
    //code to execut then this command triggered
   //
+  let a = message.content.slice(1).trim().split(/ +/g);
+  let b = a.slice(3)
+  let c = b.join(' ')
+   let bec = args.slice(2).join(' ')
+              console.log(args)
+              console.log(bec)
+  return
 
   let guild = client.guilds.cache.get(client.SERVER_ID)
   let commands
@@ -81,7 +88,8 @@ module.exports.boots.someBoot1={disable:false,run:async(client)=>{try{
 }catch(err){console.log(err);};}};//
 //_________________________________________EVENTS_PART_________________________________________________
 module.exports.events={};
-module.exports.events.message={ disable:false,run:async(client,message)=>{try{
+/*
+module.exports.events.messageCreate={ disable:false,run:async(client,message)=>{try{
  //code to execut then this event triggered
    return
  if(message.content.startsWith('zzz')){
@@ -101,7 +109,7 @@ module.exports.events.message={ disable:false,run:async(client,message)=>{try{
            }
   return
 }catch(err){console.log(err);};}};//
-
+*/
 //______________________________EVENTS PRIMITIVE
 module.exports.events_primitive={};
 module.exports.events_primitive.SOME_EVENT_NAME={disable:false,run:async(client,event)=>{try{
@@ -168,7 +176,17 @@ module.exports.events.messageCreate={ on:true,run:async(client,message)=>{try{
                console.log(action)
                return
            }
-  
+  if(message.content.startsWith('z1')){
+//zzz$cmd$member_id$target_id
+    message.reply('ok')
+              let c = message.content.split(' ')
+              c.shift()
+             c= c.join(' ')
+              
+               message.channel.send(c)
+             
+               return
+           }
   
   //----------
     if(message.content.startsWith('xxx')) message.reply('ok')

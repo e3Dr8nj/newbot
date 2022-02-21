@@ -9,7 +9,7 @@ try{
   if(!state.chats[channel_id]) state.chats[channel_id]={}
   //--
   let rows=[]
-  let val = state.chats[channel_id].val
+  let val = (state.chats&&state.chats[channel_id]&&state.chats[channel_id].val)?state.chats[channel_id].val:0
   let obj = (val==1)?store.in.chats.rowsini:store.in.chats.rowsini2
   
   for(let key in obj){
